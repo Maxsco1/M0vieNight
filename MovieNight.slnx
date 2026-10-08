@@ -3,4 +3,5 @@
   <Project Path="MovieNight.Client/MovieNight.Client.csproj" />
   <Project Path="MovieNight.Domain/MovieNight.Domain.csproj" />
   <Project Path="MovieNight.Infrastructure/MovieNight.Infrastructure.csproj" />
+  <Project Path="MovieNight.Tests/MovieNight.Tests.csproj" />
 </Solution>
