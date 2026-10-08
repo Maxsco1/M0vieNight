@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using MovieNight.Domain.Exceptions;
 using MovieNight.Domain.Models;
 using MovieNight.Infrastructure;
 
@@ -24,9 +25,10 @@ public class UserService(MovieNightDbContext context) : IUserService
             .AnyAsync(u => u.Username == username, cancellationToken);
     }
 
-    public Task<User> GetByUsernameAsync(string username, CancellationToken cancellationToken = default)
+    public async Task<User> GetByUsernameAsync(string username, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await _context.Users.FirstOrDefaultAsync(u => u.Username == username, cancellationToken) ??
+            throw new EntityDoesNotExistException("User", "username", username);
     }
 
     public Task<List<User>> GetUsersAsync(CancellationToken cancellationToken = default)

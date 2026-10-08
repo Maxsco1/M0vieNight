@@ -16,4 +16,22 @@ public class User
         Name = name;
         Email = email;
     }
+
+    public override bool Equals(object? obj)
+    {
+        if ((obj == null) || !GetType().Equals(obj.GetType()))
+        {
+            return false;
+        }
+        else
+        {
+            User maybeUser = (User)obj;
+            return Username == maybeUser.Username;
+        }
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Username);
+    }
 }

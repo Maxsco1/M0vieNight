@@ -1,5 +1,5 @@
-using System.Data.Common;
 using MovieNight.Application;
+using MovieNight.Domain.Exceptions;
 using MovieNight.Domain.Models;
 using MovieNight.Infrastructure;
 using NUnit.Framework;
@@ -38,5 +38,22 @@ public class UserTests
     public async Task ExistsByUsernameReturnsFalseOnNonExistentUsername()
     {
         Assert.False(await _service.ExistsByUsernameAsync("harri41"));
+    }
+
+    [Test]
+    public async Task GetByUsernameReturnsExpectedUserOnExistingUsername()
+    {
+        var userFromDb = await _service.GetByUsernameAsync("harri40");
+        Assert.AreEqual(userFromDb, new User("harri40", "abcde", "Harry Jones", "hj@harrimail.com"));
+    }
+
+    [Test]
+    public async Task GetByUsernameThrowsOnNonExistentUsername()
+    {
+        var exception = await Assert.ThrowsAsync<EntityDoesNotExistException>(
+            async () => await _service.GetByUsernameAsync("harri41")
+        );
+
+        Assert.AreEqual("No User with username \"harri41\" exists.", exception.Message);
     }
 }
