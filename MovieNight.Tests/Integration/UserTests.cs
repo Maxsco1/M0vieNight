@@ -99,9 +99,7 @@ public class UserTests
         var newHarry = new User("harri40", "abcd", "Harri Jones", "hj@harriimail.com");
         var oldHarry = await _service.GetByUsernameAsync("harri40");
         await _service.UpdateAsync(newHarry);
-        Assert.AreEqual("Harri Jones", oldHarry.Name);
-        Assert.True(PasswordVerifier.VerifyPassword("abcd", oldHarry.Password));
-        Assert.AreEqual("hj@harriimail.com", oldHarry.Email);
+        Assert.AreEqual(oldHarry, newHarry);
     }
 
     [Test]
