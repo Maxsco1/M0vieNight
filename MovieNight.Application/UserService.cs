@@ -31,9 +31,9 @@ public class UserService(MovieNightDbContext context) : IUserService
             throw new EntityDoesNotExistException("User", "username", username);
     }
 
-    public Task<List<User>> GetUsersAsync(CancellationToken cancellationToken = default)
+    public async Task<List<User>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await _context.Users.ToListAsync(cancellationToken);
     }
 
     public Task<User> UpdateAsync(User newUser, CancellationToken cancellationToken = default)

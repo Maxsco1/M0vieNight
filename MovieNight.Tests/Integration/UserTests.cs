@@ -56,4 +56,20 @@ public class UserTests
 
         Assert.AreEqual("No User with username \"harri41\" exists.", exception.Message);
     }
+
+    [Test]
+    public async Task GetAllReturnsAllUsers()
+    {
+        List<User> expectedList = [new User("harri40", "abcde", "Harry Jones", "hj@harrimail.com")];
+        Assert.AreEqual(expectedList, await _service.GetAllAsync());
+    }
+
+    [Test]
+    public async Task GetAllReturnsEmptyListIfNoUsers()
+    {
+        List<User> expectedList = [];
+        _context.Users.Remove(_context.Users.First(u => u.Username == "harri40"));
+        _context.SaveChanges();
+        Assert.AreEqual(expectedList, await _service.GetAllAsync());
+    }
 }
