@@ -16,8 +16,14 @@ public class UserService(MovieNightDbContext context) : IUserService
             throw new EntityAlreadyExistsException("User", "username", user.Username);
         }
 
+        user.Password = PasswordHasher.HashPassword(user.Password);
         await _context.AddAsync(user, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
+
+        if (!(await _context.SaveChangesAsync(cancellationToken) > 0))
+        {
+            throw new ModifyFailedException("create", "User");
+        }
+
         return user;
     }
 
@@ -43,8 +49,22 @@ public class UserService(MovieNightDbContext context) : IUserService
         return await _context.Users.ToListAsync(cancellationToken);
     }
 
-    public Task<User> UpdateAsync(User newUser, CancellationToken cancellationToken = default)
+    public async Task UpdateAsync(User newUser, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        if (!await ExistsByUsernameAsync(newUser.Username, cancellationToken))
+        {
+            throw new EntityDoesNotExistException("User", "username", newUser.Username);
+        }
+
+        var userFromDb = await GetByUsernameAsync(newUser.Username, cancellationToken);
+        userFromDb.Email = newUser.Email;
+        userFromDb.Password = PasswordHasher.HashPassword(newUser.Password);
+        userFromDb.Name = newUser.Name;
+
+        _context.Update(userFromDb);
+        if (!(await _context.SaveChangesAsync(cancellationToken) > 0))
+        {
+            throw new ModifyFailedException("update", "User");
+        }
     }
 }

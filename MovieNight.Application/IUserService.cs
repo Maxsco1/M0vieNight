@@ -8,6 +8,6 @@ public interface IUserService
     Task<User> GetByUsernameAsync(string username, CancellationToken cancellationToken = default);
     Task<List<User>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<User> CreateAsync(User user, CancellationToken cancellationToken = default);
-    Task<User> UpdateAsync(User newUser, CancellationToken cancellationToken = default);
+    Task UpdateAsync(User newUser, CancellationToken cancellationToken = default);
     Task DeleteByUsernameAsync(string username, CancellationToken cancellationToken = default);
 }

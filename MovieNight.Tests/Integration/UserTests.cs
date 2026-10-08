@@ -76,6 +76,8 @@ public class UserTests
     [Test]
     public async Task CreateUserCreatesUserIfNoUserWithThatUsername()
     {
+        // Counter intuitive why this test doesn't break when adding password hashing.
+        // It is because EF Core modifies the expectedUser reference.
         var expectedUser = new User("harri41", "abcde", "Harry Jones", "hj@harrimail.com");
         Assert.AreEqual(expectedUser, await _service.CreateAsync(expectedUser));
     }
@@ -89,5 +91,28 @@ public class UserTests
         );
 
         Assert.AreEqual("A(n) User with username \"harri40\" already exists.", exception.Message);
+    }
+
+    [Test]
+    public async Task UpdateUserUpdatesFieldsIfGivenUserWithExistingUsername()
+    {
+        var newHarry = new User("harri40", "abcd", "Harri Jones", "hj@harriimail.com");
+        var oldHarry = await _service.GetByUsernameAsync("harri40");
+        await _service.UpdateAsync(newHarry);
+        Assert.AreEqual("Harri Jones", oldHarry.Name);
+        Assert.True(PasswordVerifier.VerifyPassword("abcd", oldHarry.Password));
+        Assert.AreEqual("hj@harriimail.com", oldHarry.Email);
+    }
+
+    [Test]
+    public async Task UpdateUserThrowsOnNonExistentUsername()
+    {
+        var fakeHarry = new User("harri41", "abcd", "Harri Jones", "hj@harriimail.com");
+
+        var exception = await Assert.ThrowsAsync<EntityDoesNotExistException>(
+            async () => await _service.UpdateAsync(fakeHarry)
+        );
+
+        Assert.AreEqual("No User with username \"harri41\" exists.", exception.Message);
     }
 }
