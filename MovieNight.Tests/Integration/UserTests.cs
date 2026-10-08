@@ -72,4 +72,22 @@ public class UserTests
         _context.SaveChanges();
         Assert.AreEqual(expectedList, await _service.GetAllAsync());
     }
+
+    [Test]
+    public async Task CreateUserCreatesUserIfNoUserWithThatUsername()
+    {
+        var expectedUser = new User("harri41", "abcde", "Harry Jones", "hj@harrimail.com");
+        Assert.AreEqual(expectedUser, await _service.CreateAsync(expectedUser));
+    }
+
+    [Test]
+    public async Task CreateUserThrowsOnExistingUsername()
+    {
+        var existingUser = new User("harri40", "abcde", "Harry Jones", "hj@harrimail.com");
+        var exception = await Assert.ThrowsAsync<EntityAlreadyExistsException>(
+            async () => await _service.CreateAsync(existingUser)
+        );
+
+        Assert.AreEqual("A(n) User with username \"harri40\" already exists.", exception.Message);
+    }
 }

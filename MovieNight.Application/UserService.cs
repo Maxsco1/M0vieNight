@@ -9,9 +9,16 @@ public class UserService(MovieNightDbContext context) : IUserService
 {
     private readonly MovieNightDbContext _context = context;
 
-    public Task<User> CreateAsync(User user, CancellationToken cancellationToken = default)
+    public async Task<User> CreateAsync(User user, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        if (await ExistsByUsernameAsync(user.Username, cancellationToken))
+        {
+            throw new EntityAlreadyExistsException("User", "username", user.Username);
+        }
+
+        await _context.AddAsync(user, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+        return user;
     }
 
     public Task DeleteByUsernameAsync(string username, CancellationToken cancellationToken = default)
