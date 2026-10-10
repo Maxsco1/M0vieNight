@@ -1,3 +1,7 @@
+using MovieNight.Infrastructure;
+using MovieNight.Client.Components;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -5,13 +9,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 // Add DB. Schema automatically generated.
-builder.Services.AddDbContext<MovieContext>(options =>
-    options.UseSqlite("Data Source=movie_night.db")
-);
-builder.Services.AddDbContext<UserContext>(options =>
-    options.UseSqlite("Data Source=movie_night.db")
-);
-builder.Services.AddDbContext<ActorContext>(options =>
+builder.Services.AddDbContext<MovieNightDbContext>(options =>
     options.UseSqlite("Data Source=movie_night.db")
 );
 
