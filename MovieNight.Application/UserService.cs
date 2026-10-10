@@ -27,9 +27,15 @@ public class UserService(MovieNightDbContext context) : IUserService
         return user;
     }
 
-    public Task DeleteByUsernameAsync(string username, CancellationToken cancellationToken = default)
+    public async Task DeleteByUsernameAsync(string username, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        User user = await GetByUsernameAsync(username, cancellationToken);
+        _context.Users.Remove(user);
+
+        if (!(await _context.SaveChangesAsync(cancellationToken) > 0))
+        {
+            throw new ModifyFailedException("delete", "User");
+        }
     }
 
     public async Task<bool> ExistsByUsernameAsync(string username, CancellationToken cancellationToken = default)

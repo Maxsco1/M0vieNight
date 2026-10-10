@@ -113,4 +113,23 @@ public class UserTests
 
         Assert.AreEqual("No User with username \"harri41\" exists.", exception.Message);
     }
+
+    [Test]
+    public async Task DeleteByUsernameDeletesOnExistingUsername()
+    {
+        var existingUser = new User("harri40", "abcde", "Harry Jones", "hj@harrimail.com");
+        Assert.True(await _service.ExistsByUsernameAsync(existingUser.Username));
+        await _service.DeleteByUsernameAsync(existingUser.Username);
+        Assert.False(await _service.ExistsByUsernameAsync(existingUser.Username));
+    }
+
+    [Test]
+    public async Task DeleteByUsernameThrowsOnNonExistentUsername()
+    {
+        var exception = await Assert.ThrowsAsync<EntityDoesNotExistException>(
+            async () => await _service.DeleteByUsernameAsync("harri41")
+        );
+
+        Assert.AreEqual("No User with username \"harri41\" exists.", exception.Message);
+    }
 }
