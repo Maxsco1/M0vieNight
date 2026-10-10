@@ -1,3 +1,9 @@
+using MovieNight.Application;
+using MovieNight.Domain.Exceptions;
+using MovieNight.Domain.Models;
+using MovieNight.Infrastructure;
+using NUnit.Framework;
+
 namespace MovieNight.Tests.Integration;
 
 public class UserTests
