@@ -65,4 +65,25 @@ public class ActorTests
         List<Actor> expectedActors = [new Actor(1, "New Actor", [])];
         Assert.AreEqual(expectedActors, await _service.GetAllAsync());
     }
+
+    [Test]
+    public async Task CreateAsyncCreatesNewActorIfNoActorWithGivenIdExists()
+    {
+        var newActor = new Actor(0, "New Actor 2", []);
+        await _service.CreateAsync(newActor);
+        Assert.True(await _service.ExistsByIdAsync(newActor.ActorId));
+    }
+
+    [Test]
+    public async Task CreateAsyncThrowsIfActorWithGivenIdExists()
+    {
+        var existingActor = new Actor(1, "New Actor", []);
+        var expectedMessage = "A(n) Actor with ActorId \"1\" already exists.";
+
+        var exception = await Assert.ThrowsAsync<EntityAlreadyExistsException>(
+            async () => await _service.CreateAsync(existingActor)
+        );
+
+        Assert.AreEqual(expectedMessage, exception.Message);
+    }
 }

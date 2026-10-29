@@ -8,9 +8,21 @@ namespace MovieNight.Application;
 public class ActorService(MovieNightDbContext context) : IActorService
 {
     private readonly MovieNightDbContext _context = context;
-    public Task<Actor> CreateAsync(Actor Actor, CancellationToken cancellationToken = default)
+    public async Task<Actor> CreateAsync(Actor actor, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        if (await ExistsByIdAsync(actor.ActorId, cancellationToken))
+        {
+            throw new EntityAlreadyExistsException("Actor", "ActorId", actor.ActorId);
+        }
+
+        await _context.AddAsync(actor, cancellationToken);
+
+        if (await _context.SaveChangesAsync(cancellationToken) < 1)
+        {
+            throw new ModifyFailedException("create", "Actor");
+        }
+
+        return actor;
     }
 
     public Task DeleteByIdAsync(long id, CancellationToken cancellationToken = default)
