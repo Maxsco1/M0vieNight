@@ -25,22 +25,21 @@ public class ActorService(MovieNightDbContext context) : IActorService
             .AnyAsync(a => a.ActorId == id, cancellationToken);
     }
 
-    public Task<List<Actor>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<List<Actor>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await _context
+            .Actors
+            .Include(a => a.Movies)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<Actor> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
         return await _context
             .Actors
+            .Include(a => a.Movies)
             .FirstOrDefaultAsync(a => a.ActorId == id, cancellationToken) ??
             throw new EntityDoesNotExistException("Actor", "ActorId", id);
-    }
-
-    public Task<Actor> GetByNameAsync(string name, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
     }
 
     public Task UpdateAsync(Actor newActor, CancellationToken cancellationToken = default)

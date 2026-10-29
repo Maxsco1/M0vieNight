@@ -58,4 +58,11 @@ public class ActorTests
 
         Assert.AreEqual(expectedMessage, exception.Message);
     }
+
+    [Test]
+    public async Task GetAllAsyncReturnsAllActors()
+    {
+        List<Actor> expectedActors = [new Actor(1, "New Actor", [])];
+        Assert.AreEqual(expectedActors, await _service.GetAllAsync());
+    }
 }
