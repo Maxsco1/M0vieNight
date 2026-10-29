@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using MovieNight.Domain.Exceptions;
 using MovieNight.Domain.Models;
 using MovieNight.Infrastructure;
 
@@ -29,9 +30,12 @@ public class ActorService(MovieNightDbContext context) : IActorService
         throw new NotImplementedException();
     }
 
-    public Task<Actor> GetByIdAsync(long id, CancellationToken cancellationToken = default)
+    public async Task<Actor> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await _context
+            .Actors
+            .FirstOrDefaultAsync(a => a.ActorId == id, cancellationToken) ??
+            throw new EntityDoesNotExistException("Actor", "ActorId", id);
     }
 
     public Task<Actor> GetByNameAsync(string name, CancellationToken cancellationToken = default)

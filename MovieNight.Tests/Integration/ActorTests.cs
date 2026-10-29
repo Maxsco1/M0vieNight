@@ -39,4 +39,23 @@ public class ActorTests
     {
         Assert.False(await _service.ExistsByIdAsync(0));
     }
+
+    [Test]
+    public async Task GetByIdReturnsExpectedActorIfActorWithGivenId()
+    {
+        var expectedActor = new Actor(1, "New Actor", []);
+        Assert.AreEqual(expectedActor, await _service.GetByIdAsync(1));
+    }
+
+    [Test]
+    public async Task GetByIdThrowsIfNoActorWithGivenId()
+    {
+        var expectedMessage = "No Actor with ActorId \"0\" exists.";
+
+        var exception = await Assert.ThrowsAsync<EntityDoesNotExistException>(
+            async () => await _service.GetByIdAsync(0)
+        );
+
+        Assert.AreEqual(expectedMessage, exception.Message);
+    }
 }
