@@ -60,8 +60,31 @@ public class ActorService(MovieNightDbContext context) : IActorService
             throw new EntityDoesNotExistException("Actor", "ActorId", id);
     }
 
-    public Task UpdateAsync(Actor newActor, CancellationToken cancellationToken = default)
+    public async Task UpdateAsync(Actor newActor, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var actor = await GetByIdAsync(newActor.ActorId, cancellationToken);
+        actor.Name = newActor.Name;
+        await HandleUpdateActorMovies(actor, actor.Movies, newActor.Movies);
+        await _context.SaveChangesAsync(cancellationToken);
+
+    }
+
+    private static async Task HandleUpdateActorMovies(Actor actor, HashSet<Movie> previousMovies, HashSet<Movie> newMovies)
+    {
+        foreach (var movie in newMovies)
+        {
+            if (!previousMovies.Contains(movie))
+            {
+                actor.Movies.Add(movie);
+            }
+        }
+
+        foreach (var movie in previousMovies)
+        {
+            if (!newMovies.Contains(movie))
+            {
+                actor.Movies.Remove(movie);
+            }
+        }
     }
 }
