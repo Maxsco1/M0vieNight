@@ -86,4 +86,24 @@ public class ActorTests
 
         Assert.AreEqual(expectedMessage, exception.Message);
     }
+
+    [Test]
+    public async Task DeleteByIdAsyncDeletesOnExistingActor()
+    {
+        Assert.True(await _service.ExistsByIdAsync(1));
+        await _service.DeleteByIdAsync(1);
+        Assert.False(await _service.ExistsByIdAsync(1));
+    }
+
+    [Test]
+    public async Task DeleteByIdAsyncThrowsOnNonExistentActor()
+    {
+        var expectedMessage = "No Actor with ActorId \"0\" exists.";
+
+        var exception = await Assert.ThrowsAsync<EntityDoesNotExistException>(
+            async () => await _service.DeleteByIdAsync(0)
+        );
+
+        Assert.AreEqual(expectedMessage, exception.Message);
+    }
 }

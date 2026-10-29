@@ -25,9 +25,15 @@ public class ActorService(MovieNightDbContext context) : IActorService
         return actor;
     }
 
-    public Task DeleteByIdAsync(long id, CancellationToken cancellationToken = default)
+    public async Task DeleteByIdAsync(long id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var actor = await GetByIdAsync(id, cancellationToken);
+        _context.Remove(actor);
+
+        if (await _context.SaveChangesAsync(cancellationToken) < 1)
+        {
+            throw new ModifyFailedException("delete", "Actor");
+        }
     }
 
     public async Task<bool> ExistsByIdAsync(long id, CancellationToken cancellationToken = default)
