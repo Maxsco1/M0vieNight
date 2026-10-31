@@ -44,4 +44,38 @@ public class MovieRatingTests
     {
         Assert.False(await _service.ExistsByMovieIdAndUsernameAsync(0, "fakeuser"));
     }
+
+    [Test]
+    public async Task GetByMovieIdAndUsernameAsyncReturnsRatingIfExists()
+    {
+        Assert.True(await _service.ExistsByMovieIdAndUsernameAsync(1, "fakeuser"));
+        var ratingFromDb = await _service.GetByMovieIdAndUsernameAsync(1, "fakeuser");
+        Assert.AreEqual(1, ratingFromDb.MovieId);
+        Assert.AreEqual("fakeuser", ratingFromDb.UserUsername);
+        Assert.AreEqual(2, ratingFromDb.RatingStars);
+    }
+
+    [Test]
+    public async Task GetByMovieIdAndUsernameAsyncThrowsOnNonExistentMovie()
+    {
+        var expectedMessage = "No Rating with MovieId and Username \"(0, someusername)\" exists.";
+
+        var exception = await Assert.ThrowsAsync<EntityDoesNotExistException>(
+            async () => await _service.GetByMovieIdAndUsernameAsync(0, "someusername")
+        );
+
+        Assert.AreEqual(expectedMessage, exception.Message);
+    }
+
+    [Test]
+    public async Task GetByMovieIdAndUsernameAsyncThrowsOnNonExistentUser()
+    {
+        var expectedMessage = "No Rating with MovieId and Username \"(1, someusername)\" exists.";
+
+        var exception = await Assert.ThrowsAsync<EntityDoesNotExistException>(
+            async () => await _service.GetByMovieIdAndUsernameAsync(1, "someusername")
+        );
+
+        Assert.AreEqual(expectedMessage, exception.Message);
+    }
 }
