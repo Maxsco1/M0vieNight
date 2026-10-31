@@ -17,9 +17,15 @@ public class RatingService(MovieNightDbContext context) : IRatingService
         throw new NotImplementedException();
     }
 
-    public Task<bool> ExistsByMovieIdAndUsernameAsync(long movieId, string username, CancellationToken cancellationToken = default)
+    public async Task<bool> ExistsByMovieIdAndUsernameAsync(long movieId, string username, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await _context
+            .Ratings
+            .AnyAsync(
+                mr => mr.MovieId == movieId &&
+                mr.UserUsername == username,
+                cancellationToken
+            );
     }
 
     public Task<List<MovieRating>> GetAllAsync(CancellationToken cancellationToken = default)
