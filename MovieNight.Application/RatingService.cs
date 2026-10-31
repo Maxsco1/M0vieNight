@@ -12,12 +12,12 @@ public class RatingService(MovieNightDbContext context) : IRatingService
         throw new NotImplementedException();
     }
 
-    public Task DeleteByIdAsync(long id, CancellationToken cancellationToken = default)
+    public Task DeleteByMovieIdAndUsernameAsync(long movieId, string username, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
 
-    public Task<bool> ExistsByIdAsync(long id, CancellationToken cancellationToken = default)
+    public Task<bool> ExistsByMovieIdAndUsernameAsync(long movieId, string username, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
@@ -27,7 +27,7 @@ public class RatingService(MovieNightDbContext context) : IRatingService
         throw new NotImplementedException();
     }
 
-    public Task<MovieRating> GetByIdAsync(long id, CancellationToken cancellationToken = default)
+    public Task<MovieRating> GetByMovieIdAndUsernameAsync(long movieId, string username, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
