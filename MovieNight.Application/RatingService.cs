@@ -29,9 +29,11 @@ public class RatingService(MovieNightDbContext context) : IRatingService
             );
     }
 
-    public Task<List<MovieRating>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<List<MovieRating>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await _context
+            .Ratings
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<MovieRating> GetByMovieIdAndUsernameAsync(long movieId, string username, CancellationToken cancellationToken = default)

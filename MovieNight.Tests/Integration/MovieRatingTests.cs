@@ -78,4 +78,14 @@ public class MovieRatingTests
 
         Assert.AreEqual(expectedMessage, exception.Message);
     }
+
+    [Test]
+    public async Task GetAllReturnsAListOfAllRatings()
+    {
+        var ratings = await _service.GetAllAsync();
+        Assert.AreEqual(1, ratings.Count);
+
+        var movieFromDb = await _service.GetByMovieIdAndUsernameAsync(1, "fakeuser");
+        Assert.AreEqual(movieFromDb, ratings.First(mr => mr.MovieId == 1 && mr.UserUsername == "fakeuser"));
+    }
 }
