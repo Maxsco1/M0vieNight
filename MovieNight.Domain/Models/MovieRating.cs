@@ -16,4 +16,22 @@ public class MovieRating
         Movie = onMovie;
         RatingStars = stars;
     }
+
+    public override bool Equals(object? obj)
+    {
+        if ((obj == null) || !GetType().Equals(obj.GetType()))
+        {
+            return false;
+        }
+        else
+        {
+            MovieRating maybeRating = (MovieRating)obj;
+            return MovieId == maybeRating.MovieId && UserUsername == maybeRating.UserUsername;
+        }
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(MovieId, UserUsername);
+    }
 }
