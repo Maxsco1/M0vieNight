@@ -8,9 +8,23 @@ namespace MovieNight.Application;
 public class RatingService(MovieNightDbContext context) : IRatingService
 {
     private readonly MovieNightDbContext _context = context;
-    public Task<MovieRating> CreateAsync(MovieRating movieRating, CancellationToken cancellationToken = default)
+    public async Task<MovieRating> CreateAsync(MovieRating movieRating, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        if (await ExistsByMovieIdAndUsernameAsync(movieRating.MovieId, movieRating.UserUsername, cancellationToken))
+        {
+            throw new EntityAlreadyExistsException("MovieRating", "MovieId and Username", $"({movieRating.MovieId}, {movieRating.UserUsername})");
+        }
+
+        await VerifyRatingHasValidMovieIdAndUsername(movieRating.MovieId, movieRating.UserUsername, cancellationToken);
+
+        await _context.Ratings.AddAsync(movieRating, cancellationToken);
+
+        if (await _context.SaveChangesAsync(cancellationToken) < 1)
+        {
+            throw new ModifyFailedException("create", "MovieRating");
+        }
+
+        return movieRating;
     }
 
     public Task DeleteByMovieIdAndUsernameAsync(long movieId, string username, CancellationToken cancellationToken = default)
@@ -53,5 +67,18 @@ public class RatingService(MovieNightDbContext context) : IRatingService
     public Task UpdateAsync(MovieRating newMovieRating, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
+    }
+
+    private async Task VerifyRatingHasValidMovieIdAndUsername(long movieId, string username, CancellationToken cancellationToken)
+    {
+        if (!await _context.Movies.AnyAsync(m => m.MovieId == movieId, cancellationToken))
+        {
+            throw new EntityDoesNotExistException("Movie", "MovieId", movieId);
+        }
+
+        if (!await _context.Users.AnyAsync(u => u.Username == username, cancellationToken))
+        {
+            throw new EntityDoesNotExistException("User", "Username", username);
+        }
     }
 }
