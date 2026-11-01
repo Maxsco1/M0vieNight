@@ -27,9 +27,17 @@ public class RatingService(MovieNightDbContext context) : IRatingService
         return movieRating;
     }
 
-    public Task DeleteByMovieIdAndUsernameAsync(long movieId, string username, CancellationToken cancellationToken = default)
+    public async Task DeleteByMovieIdAndUsernameAsync(long movieId, string username, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        await VerifyRatingHasValidMovieIdAndUsername(movieId, username, cancellationToken);
+        var movieRating = await GetByMovieIdAndUsernameAsync(movieId, username, cancellationToken);
+
+        _context.Ratings.Remove(movieRating);
+
+        if (await _context.SaveChangesAsync(cancellationToken) < 1)
+        {
+            throw new ModifyFailedException("delete", "MovieRating");
+        }
     }
 
     public async Task<bool> ExistsByMovieIdAndUsernameAsync(long movieId, string username, CancellationToken cancellationToken = default)
