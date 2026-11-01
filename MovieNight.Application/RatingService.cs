@@ -72,9 +72,20 @@ public class RatingService(MovieNightDbContext context) : IRatingService
             );
     }
 
-    public Task UpdateAsync(MovieRating newMovieRating, CancellationToken cancellationToken = default)
+    public async Task UpdateByMovieIdAndUsernameAsync(MovieRating newMovieRating, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var movieId = newMovieRating.MovieId;
+        var username = newMovieRating.UserUsername;
+        await VerifyRatingHasValidMovieIdAndUsername(movieId, username, cancellationToken);
+        var movieRating = await GetByMovieIdAndUsernameAsync(movieId, username, cancellationToken);
+        movieRating.RatingStars = newMovieRating.RatingStars;
+
+        _context.Update(movieRating);
+
+        if (await _context.SaveChangesAsync(cancellationToken) < 1)
+        {
+            throw new ModifyFailedException("update", "MovieRating");
+        }
     }
 
     private async Task VerifyRatingHasValidMovieIdAndUsername(long movieId, string username, CancellationToken cancellationToken)

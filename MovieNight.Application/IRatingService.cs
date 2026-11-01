@@ -8,6 +8,6 @@ public interface IRatingService
     Task<MovieRating> GetByMovieIdAndUsernameAsync(long movieId, string username, CancellationToken cancellationToken = default);
     Task<List<MovieRating>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<MovieRating> CreateAsync(MovieRating movieRating, CancellationToken cancellationToken = default);
-    Task UpdateAsync(MovieRating newMovieRating, CancellationToken cancellationToken = default);
+    Task UpdateByMovieIdAndUsernameAsync(MovieRating newMovieRating, CancellationToken cancellationToken = default);
     Task DeleteByMovieIdAndUsernameAsync(long movieId, string username, CancellationToken cancellationToken = default);
 }

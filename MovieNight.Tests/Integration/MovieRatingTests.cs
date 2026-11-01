@@ -187,4 +187,51 @@ public class MovieRatingTests
 
         Assert.AreEqual(expectedMessage, exception.Message);
     }
+
+    [Test]
+    public async Task UpdateAsyncUpdatesRatingIfMovieAndRatingAndUserExist()
+    {
+        var ratingFromDb = await _service.GetByMovieIdAndUsernameAsync(1, "fakeuser");
+        var newRating = new MovieRating { MovieId = 1, UserUsername = "fakeuser", RatingStars = 4 };
+
+        await _service.UpdateByMovieIdAndUsernameAsync(newRating);
+
+        Assert.AreEqual(ratingFromDb, newRating);
+    }
+
+    [Test]
+    public async Task UpdateAsyncThrowsOnNonExistentRating()
+    {
+        var expectedMessage = "No Rating with MovieId and Username \"(2, fakeuser)\" exists.";
+
+        var exception = await Assert.ThrowsAsync<EntityDoesNotExistException>(
+            async () => await _service.UpdateByMovieIdAndUsernameAsync(new MovieRating { MovieId = 2, UserUsername = "fakeuser", RatingStars = 4 })
+        );
+
+        Assert.AreEqual(expectedMessage, exception.Message);
+    }
+
+    [Test]
+    public async Task UpdateAsyncThrowsOnNonExistentMovie()
+    {
+        var expectedMessage = "No Movie with MovieId \"0\" exists.";
+
+        var exception = await Assert.ThrowsAsync<EntityDoesNotExistException>(
+            async () => await _service.UpdateByMovieIdAndUsernameAsync(new MovieRating { MovieId = 0, UserUsername = "fakeuser", RatingStars = 4 })
+        );
+
+        Assert.AreEqual(expectedMessage, exception.Message);
+    }
+
+    [Test]
+    public async Task UpdateAsyncThrowsOnNonExistentUser()
+    {
+        var expectedMessage = "No User with Username \"fakeooser\" exists.";
+
+        var exception = await Assert.ThrowsAsync<EntityDoesNotExistException>(
+            async () => await _service.UpdateByMovieIdAndUsernameAsync(new MovieRating { MovieId = 1, UserUsername = "fakeooser", RatingStars = 4 })
+        );
+
+        Assert.AreEqual(expectedMessage, exception.Message);
+    }
 }
