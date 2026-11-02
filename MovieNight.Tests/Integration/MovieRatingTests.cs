@@ -20,11 +20,17 @@ public class MovieRatingTests
         var movie = new Movie(0, "example1", "desc1", [], "Horror", [], DateOnly.FromDayNumber(729635), "example.png");
         var movie2 = new Movie(0, "example2", "desc2", [], "Thriller", [], DateOnly.FromDayNumber(729635), "example2.png");
         var user = new User("fakeuser", "123", "Fake User", "fakeuser@fakemail.com");
+        var user2 = new User("fakeuser2", "321", "Fake Ooser", "fakeuser2@fakemail.com");
         var rating = new MovieRating(user, movie, 2);
+        var rating2 = new MovieRating(user, movie2, 3);
+        var rating3 = new MovieRating(user2, movie, 5);
         _context.Movies.Add(movie);
         _context.Movies.Add(movie2);
         _context.Users.Add(user);
+        _context.Users.Add(user2);
         _context.Ratings.Add(rating);
+        _context.Ratings.Add(rating2);
+        _context.Ratings.Add(rating3);
         _context.SaveChanges();
         _service = new RatingService(_context);
     }
@@ -85,23 +91,45 @@ public class MovieRatingTests
     public async Task GetAllReturnsAListOfAllRatings()
     {
         var ratings = await _service.GetAllAsync();
-        Assert.AreEqual(1, ratings.Count);
+        Assert.AreEqual(3, ratings.Count);
 
         var movieFromDb = await _service.GetByMovieIdAndUsernameAsync(1, "fakeuser");
         Assert.AreEqual(movieFromDb, ratings.First(mr => mr.MovieId == 1 && mr.UserUsername == "fakeuser"));
     }
 
     [Test]
+    public async Task GetAllForMovieIdReturnsOnlyEntriesForASpecificMovie()
+    {
+        List<MovieRating> expectedRatings = [
+            await _service.GetByMovieIdAndUsernameAsync(1, "fakeuser"),
+            await _service.GetByMovieIdAndUsernameAsync(1, "fakeuser2")
+        ];
+
+        Assert.AreEqual(expectedRatings, await _service.GetAllForMovieAsync(1));
+    }
+
+    [Test]
+    public async Task GetAllByAuthorReturnsOnlyEntriesForASpecificUser()
+    {
+        List<MovieRating> expectedRatings = [
+            await _service.GetByMovieIdAndUsernameAsync(1, "fakeuser"),
+            await _service.GetByMovieIdAndUsernameAsync(2, "fakeuser")
+        ];
+
+        Assert.AreEqual(expectedRatings, await _service.GetAllByAuthorAsync("fakeuser"));
+    }
+
+    [Test]
     public async Task CreateAsyncCreatesRatingIfMovieAndUserExistAndRatingDoesNotAlreadyExist()
     {
-        var newRating = new MovieRating { UserUsername = "fakeuser", MovieId = 2 };
+        var newRating = new MovieRating { UserUsername = "fakeuser2", MovieId = 2 };
         var allRatingsBefore = await _service.GetAllAsync();
 
         await _service.CreateAsync(newRating);
         var allRatingsAfter = await _service.GetAllAsync();
 
-        Assert.AreEqual(1, allRatingsBefore.Count);
-        Assert.AreEqual(2, allRatingsAfter.Count);
+        Assert.AreEqual(3, allRatingsBefore.Count);
+        Assert.AreEqual(allRatingsBefore.Count + 1, allRatingsAfter.Count);
         Assert.AreEqual(allRatingsAfter.Last(), newRating);
     }
 
@@ -155,10 +183,10 @@ public class MovieRatingTests
     [Test]
     public async Task DeleteAsyncThrowsOnNonExistentRating()
     {
-        var expectedMessage = "No Rating with MovieId and Username \"(2, fakeuser)\" exists.";
+        var expectedMessage = "No Rating with MovieId and Username \"(2, fakeuser2)\" exists.";
 
         var exception = await Assert.ThrowsAsync<EntityDoesNotExistException>(
-            async () => await _service.DeleteByMovieIdAndUsernameAsync(2, "fakeuser")
+            async () => await _service.DeleteByMovieIdAndUsernameAsync(2, "fakeuser2")
         );
 
         Assert.AreEqual(expectedMessage, exception.Message);
@@ -202,10 +230,10 @@ public class MovieRatingTests
     [Test]
     public async Task UpdateAsyncThrowsOnNonExistentRating()
     {
-        var expectedMessage = "No Rating with MovieId and Username \"(2, fakeuser)\" exists.";
+        var expectedMessage = "No Rating with MovieId and Username \"(2, fakeuser2)\" exists.";
 
         var exception = await Assert.ThrowsAsync<EntityDoesNotExistException>(
-            async () => await _service.UpdateByMovieIdAndUsernameAsync(new MovieRating { MovieId = 2, UserUsername = "fakeuser", RatingStars = 4 })
+            async () => await _service.UpdateByMovieIdAndUsernameAsync(new MovieRating { MovieId = 2, UserUsername = "fakeuser2", RatingStars = 4 })
         );
 
         Assert.AreEqual(expectedMessage, exception.Message);
