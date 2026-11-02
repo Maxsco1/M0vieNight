@@ -34,6 +34,8 @@ public class MovieService(MovieNightDbContext context) : IMovieService
     {
         return await _context
             .Movies
+            .Include(m => m.Actors)
+            .Include(m => m.Ratings)
             .FirstOrDefaultAsync(
                 m => m.MovieId == movieId, cancellationToken
             ) ??
@@ -44,6 +46,4 @@ public class MovieService(MovieNightDbContext context) : IMovieService
     {
         throw new NotImplementedException();
     }
-
-
 }
