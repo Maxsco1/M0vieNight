@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using MovieNight.Application;
 using MovieNight.Domain.Exceptions;
 using MovieNight.Domain.Models;
@@ -70,5 +71,45 @@ public class MovieTests
         ];
 
         Assert.AreEqual(expectedMovies, await _service.GetAllAsync());
+    }
+
+    [Test]
+    public async Task CreateAsyncReturnsNewMovieIfItDoesNotAlreadyExist()
+    {
+        var newMovie = new Movie(0, "example3", "desc3", [], "Comedy", [], DateOnly.FromDayNumber(729630), "example3.png");
+
+        Assert.AreEqual(newMovie, await _service.CreateAsync(newMovie));
+    }
+
+    [Test]
+    public async Task CreateAsyncAddsNewActorsToActorsTable()
+    {
+        HashSet<Actor> newActors = [
+            new Actor(0, "yomomma", []),
+            new Actor(2, "Leo", [])
+        ];
+
+        // Above ID is trickery to avoid the set removing the latter actor 
+        // since my Equals method only uses ID.
+
+        Assert.True(_context.Actors.Count() == 0);
+
+        var newMovie = new Movie(0, "example3", "desc3", [], "Comedy", newActors, DateOnly.FromDayNumber(729630), "example3.png");
+        Assert.AreEqual(newMovie, await _service.CreateAsync(newMovie));
+
+        Assert.True(_context.Actors.Count() == 2);
+    }
+
+    [Test]
+    public async Task CreateAsyncThrowsIfMovieAlreadyExists()
+    {
+        var expectedMessage = "A(n) Movie with MovieId \"1\" already exists.";
+        var newMovie = new Movie(1, "example3", "desc3", [], "Comedy", [], DateOnly.FromDayNumber(729630), "example3.png");
+
+        var exception = await Assert.ThrowsAsync<EntityAlreadyExistsException>(
+            async () => await _service.CreateAsync(newMovie)
+        );
+
+        Assert.AreEqual(expectedMessage, exception.Message);
     }
 }

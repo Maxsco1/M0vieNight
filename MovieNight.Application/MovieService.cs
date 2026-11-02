@@ -10,7 +10,20 @@ public class MovieService(MovieNightDbContext context) : IMovieService
     private readonly MovieNightDbContext _context = context;
     public async Task<Movie> CreateAsync(Movie movie, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        if (await ExistsByIdAsync(movie.MovieId, cancellationToken))
+        {
+            throw new EntityAlreadyExistsException("Movie", "MovieId", movie.MovieId);
+        }
+
+        await _context.Movies.AddAsync(movie, cancellationToken);
+        await AddNewActorsToDb(movie.Actors);
+
+        if (await _context.SaveChangesAsync(cancellationToken) < 1)
+        {
+            throw new ModifyFailedException("create", "MovieRating");
+        }
+
+        return movie;
     }
 
     public Task DeleteByIdAsync(long movieId, CancellationToken cancellationToken = default)
@@ -49,5 +62,16 @@ public class MovieService(MovieNightDbContext context) : IMovieService
     public Task UpdateAsync(Movie movie, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
+    }
+
+    private async Task AddNewActorsToDb(HashSet<Actor> actorsFromMovie)
+    {
+        foreach (var actor in actorsFromMovie)
+        {
+            if (!await _context.Actors.AnyAsync(a => a.ActorId == actor.ActorId))
+            {
+                await _context.Actors.AddAsync(actor);
+            }
+        }
     }
 }
