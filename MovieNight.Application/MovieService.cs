@@ -25,9 +25,13 @@ public class MovieService(MovieNightDbContext context) : IMovieService
             .AnyAsync(m => m.MovieId == movieId, cancellationToken);
     }
 
-    public Task<List<Movie>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<List<Movie>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await _context
+            .Movies
+            .Include(m => m.Actors)
+            .Include(m => m.Ratings)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<Movie> GetByIdAsync(long movieId, CancellationToken cancellationToken = default)

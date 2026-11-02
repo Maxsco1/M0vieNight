@@ -60,4 +60,15 @@ public class MovieTests
 
         Assert.AreEqual(expectedMessage, exception.Message);
     }
+
+    [Test]
+    public async Task GetAllReturnsAllMovies()
+    {
+        List<Movie> expectedMovies = [
+            new Movie(1, "example1", "desc1", [], "Horror", [], DateOnly.FromDayNumber(729635), "example.png"),
+            new Movie(2, "example2", "desc2", [], "Thriller", [], DateOnly.FromDayNumber(729635), "example2.png")
+        ];
+
+        Assert.AreEqual(expectedMovies, await _service.GetAllAsync());
+    }
 }
