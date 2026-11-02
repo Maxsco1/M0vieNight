@@ -1,4 +1,5 @@
 using MovieNight.Application;
+using MovieNight.Domain.Exceptions;
 using MovieNight.Domain.Models;
 using MovieNight.Infrastructure;
 using NUnit.Framework;
@@ -39,5 +40,24 @@ public class MovieTests
     public async Task ExistsByIdReturnsFalseOnNonExistentMovie()
     {
         Assert.False(await _service.ExistsByIdAsync(0));
+    }
+
+    [Test]
+    public async Task GetByIdReturnsExistingMovie()
+    {
+        var expectedMovie = new Movie(1, "example1", "desc1", [], "Horror", [], DateOnly.FromDayNumber(729635), "example.png");
+        Assert.AreEqual(expectedMovie, await _service.GetByIdAsync(1));
+    }
+
+    [Test]
+    public async Task GetByIdThrowsOnNonExistentMovie()
+    {
+        var expectedMessage = "No Movie with MovieId \"0\" exists.";
+
+        var exception = await Assert.ThrowsAsync<EntityDoesNotExistException>(
+            async () => await _service.GetByIdAsync(0)
+        );
+
+        Assert.AreEqual(expectedMessage, exception.Message);
     }
 }

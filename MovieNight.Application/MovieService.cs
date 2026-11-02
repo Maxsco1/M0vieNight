@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using MovieNight.Domain.Exceptions;
 using MovieNight.Domain.Models;
 using MovieNight.Infrastructure;
 
@@ -29,13 +30,20 @@ public class MovieService(MovieNightDbContext context) : IMovieService
         throw new NotImplementedException();
     }
 
-    public Task<Movie> GetByMovieId(long movieId, CancellationToken cancellationToken = default)
+    public async Task<Movie> GetByIdAsync(long movieId, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await _context
+            .Movies
+            .FirstOrDefaultAsync(
+                m => m.MovieId == movieId, cancellationToken
+            ) ??
+            throw new EntityDoesNotExistException("Movie", "MovieId", movieId);
     }
 
     public Task UpdateAsync(Movie movie, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
+
+
 }
