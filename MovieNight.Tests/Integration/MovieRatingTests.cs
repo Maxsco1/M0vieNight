@@ -109,7 +109,7 @@ public class MovieRatingTests
     }
 
     [Test]
-    public async Task GetAllByUsernameReturnsOnlyEntriesForASpecificUser()
+    public async Task GetAllByAuthorReturnsOnlyEntriesForASpecificUser()
     {
         List<MovieRating> expectedRatings = [
             await _service.GetByMovieIdAndUsernameAsync(1, "fakeuser"),
