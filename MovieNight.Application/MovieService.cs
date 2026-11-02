@@ -8,7 +8,7 @@ namespace MovieNight.Application;
 public class MovieService(MovieNightDbContext context) : IMovieService
 {
     private readonly MovieNightDbContext _context = context;
-    public Task<MovieRating> CreateAsync(Movie movie, CancellationToken cancellationToken = default)
+    public async Task<Movie> CreateAsync(Movie movie, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
