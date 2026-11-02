@@ -24,4 +24,22 @@ public class Movie
     }
 
     public Movie() { }
+
+    public override bool Equals(object? obj)
+    {
+        if ((obj == null) || !GetType().Equals(obj.GetType()))
+        {
+            return false;
+        }
+        else
+        {
+            Movie maybeMovie = (Movie)obj;
+            return MovieId == maybeMovie.MovieId;
+        }
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(MovieId);
+    }
 }
