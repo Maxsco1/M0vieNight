@@ -58,6 +58,22 @@ public class RatingService(MovieNightDbContext context) : IRatingService
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<List<MovieRating>> GetAllByAuthorAsync(string username, CancellationToken cancellationToken = default)
+    {
+        return await _context
+            .Ratings
+            .Where(mr => mr.UserUsername == username)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<MovieRating>> GetAllForMovieAsync(long movieId, CancellationToken cancellationToken = default)
+    {
+        return await _context
+            .Ratings
+            .Where(mr => mr.MovieId == movieId)
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<MovieRating> GetByMovieIdAndUsernameAsync(long movieId, string username, CancellationToken cancellationToken = default)
     {
         return await _context
