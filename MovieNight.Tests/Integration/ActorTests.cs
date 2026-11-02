@@ -157,18 +157,18 @@ public class ActorTests
     [Test]
     public async Task UpdateAsyncRemovesEntriesInPreviousMovieListButNotInCurrent()
     {
-        var movie = new Movie(0, "example1", "desc1", [], "Horror", [], DateOnly.FromDayNumber(729635), "example.png");
+        var movie = new Movie(1, "example1", "desc1", [], "Horror", [], DateOnly.FromDayNumber(729635), "example.png");
         HashSet<Movie> moviesBefore = [
             movie,
         ];
 
         HashSet<Movie> moviesAfter = [
-            new Movie(0, "example2", "desc2", [], "Mystery", [], DateOnly.FromDayNumber(729635), "example2.png"),
-            new Movie(0, "example3", "desc3", [], "Philosophy", [], DateOnly.FromDayNumber(729635), "example3.png"),
-            new Movie(0, "example4", "desc4", [], "Programming", [], DateOnly.FromDayNumber(729635), "example4.png"),
+            new Movie(2, "example2", "desc2", [], "Mystery", [], DateOnly.FromDayNumber(729635), "example2.png"),
+            new Movie(3, "example3", "desc3", [], "Philosophy", [], DateOnly.FromDayNumber(729635), "example3.png"),
+            new Movie(4, "example4", "desc4", [], "Programming", [], DateOnly.FromDayNumber(729635), "example4.png"),
         ];
 
-        await _context.AddAsync(movie);
+        await _context.Movies.AddAsync(movie);
 
         foreach (var _movie in moviesAfter)
         {
