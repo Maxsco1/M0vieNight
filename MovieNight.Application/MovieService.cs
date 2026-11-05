@@ -20,7 +20,7 @@ public class MovieService(MovieNightDbContext context) : IMovieService
 
         if (await _context.SaveChangesAsync(cancellationToken) < 1)
         {
-            throw new ModifyFailedException("create", "MovieRating");
+            throw new ModifyFailedException("create", "Movie");
         }
 
         return movie;
