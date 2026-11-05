@@ -17,9 +17,11 @@ public class MovieTests
     {
         var factory = new MovieNightDbContextFactory();
         _context = factory.CreateContext();
+        var actor = new Actor(0, "Com Truise", []);
         var movie = new Movie(0, "example1", "desc1", [], "Horror", [], DateOnly.FromDayNumber(729635), "example.png");
-        var movie2 = new Movie(0, "example2", "desc2", [], "Thriller", [], DateOnly.FromDayNumber(729635), "example2.png");
+        var movie2 = new Movie(0, "example2", "desc2", [], "Thriller", [actor], DateOnly.FromDayNumber(729635), "example2.png");
         _context.Movies.Add(movie);
+        _context.Actors.Add(actor);
         _context.Movies.Add(movie2);
         _context.SaveChanges();
         _service = new MovieService(_context);
@@ -128,6 +130,44 @@ public class MovieTests
 
         var exception = await Assert.ThrowsAsync<EntityDoesNotExistException>(
             async () => await _service.DeleteByIdAsync(0)
+        );
+
+        Assert.AreEqual(expectedMessage, exception.Message);
+    }
+
+    [Test]
+    public async Task UpdateUpdatesExistingMovieIfExists()
+    {
+        var updatedMovie = new Movie(1, "3xample1", "d3sc1", [], "H0rror", [], DateOnly.FromDayNumber(729631), "example2.png");
+
+        await _service.UpdateAsync(updatedMovie);
+
+        Assert.AreEqual(updatedMovie, await _service.GetByIdAsync(1));
+    }
+
+    [Test]
+    public async Task UpdateRemovesRemovedActorsAndAddsNewOnesFromUpdatedMovie()
+    {
+        HashSet<Actor> newActors = [
+            new Actor(0, "Gugh Hrant", []),
+            new Actor(0, "Hom Tanks", []),
+        ];
+
+        var updatedMovie = new Movie(1, "3xample1", "d3sc1", [], "H0rror", newActors, DateOnly.FromDayNumber(729631), "example2.png");
+        await _service.UpdateAsync(updatedMovie);
+
+        Assert.AreEqual(updatedMovie, await _service.GetByIdAsync(1));
+        Assert.AreEqual(newActors, updatedMovie.Actors);
+    }
+
+    [Test]
+    public async Task UpdateThrowsOnNonExistentTargetMovie()
+    {
+        var expectedMessage = "No Movie with MovieId \"0\" exists.";
+        var updatedMovie = new Movie(0, "3xample1", "d3sc1", [], "H0rror", [], DateOnly.FromDayNumber(729631), "example2.png");
+
+        var exception = await Assert.ThrowsAsync<EntityDoesNotExistException>(
+            async () => await _service.UpdateAsync(updatedMovie)
         );
 
         Assert.AreEqual(expectedMessage, exception.Message);

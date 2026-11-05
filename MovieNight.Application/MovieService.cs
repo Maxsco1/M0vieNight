@@ -65,9 +65,40 @@ public class MovieService(MovieNightDbContext context) : IMovieService
             throw new EntityDoesNotExistException("Movie", "MovieId", movieId);
     }
 
-    public Task UpdateAsync(Movie movie, CancellationToken cancellationToken = default)
+    public async Task UpdateAsync(Movie movie, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var movieFromDb = await GetByIdAsync(movie.MovieId, cancellationToken);
+        movieFromDb.Category = movie.Category;
+        movieFromDb.Description = movie.Description;
+        movieFromDb.PathToCoverImage = movie.PathToCoverImage;
+        movieFromDb.ReleaseDate = movie.ReleaseDate;
+        movieFromDb.Title = movie.Title;
+        await HandleActorUpdate(movieFromDb, movieFromDb.Actors, movie.Actors);
+
+        if (await _context.SaveChangesAsync(cancellationToken) < 1)
+        {
+            throw new ModifyFailedException("update", "Movie");
+        }
+
+    }
+
+    private static async Task HandleActorUpdate(Movie movie, HashSet<Actor> oldActors, HashSet<Actor> newActors)
+    {
+        foreach (var newActor in newActors)
+        {
+            if (!oldActors.Contains(newActor))
+            {
+                movie.Actors.Add(newActor);
+            }
+        }
+
+        foreach (var oldActor in oldActors)
+        {
+            if (!newActors.Contains(oldActor))
+            {
+                movie.Actors.Remove(oldActor);
+            }
+        }
     }
 
     private async Task AddNewActorsToDb(HashSet<Actor> actorsFromMovie)
