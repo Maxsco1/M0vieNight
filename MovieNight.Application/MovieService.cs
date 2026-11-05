@@ -26,9 +26,15 @@ public class MovieService(MovieNightDbContext context) : IMovieService
         return movie;
     }
 
-    public Task DeleteByIdAsync(long movieId, CancellationToken cancellationToken = default)
+    public async Task DeleteByIdAsync(long movieId, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var movie = await GetByIdAsync(movieId, cancellationToken);
+        _context.Movies.Remove(movie);
+
+        if (await _context.SaveChangesAsync(cancellationToken) < 1)
+        {
+            throw new ModifyFailedException("delete", "Movie");
+        }
     }
 
     public async Task<bool> ExistsByIdAsync(long movieId, CancellationToken cancellationToken = default)
